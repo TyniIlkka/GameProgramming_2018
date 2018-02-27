@@ -345,7 +345,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 570469387aaab13468422786bf4ca905, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Unit: {fileID: 1597410190}
+  Unit: {fileID: 0}
 --- !u!4 &527925837
 Transform:
   m_ObjectHideFlags: 0
@@ -618,12 +618,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1597410190 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114391899213513196, guid: b50a1b663811d304989485cecf33b28d,
-    type: 2}
-  m_PrefabInternal: {fileID: 1845575941}
-  m_Script: {fileID: 11500000, guid: 7707d894128e4fdda694f5e1bd70992d, type: 3}
 --- !u!1 &1621109181
 GameObject:
   m_ObjectHideFlags: 0
