@@ -37,7 +37,7 @@ namespace TankGame
         }
         #endregion
 
-        private void Update()
+        private void LateUpdate()
         {
 
             Vector3 _tmpPosition = _target.position;
