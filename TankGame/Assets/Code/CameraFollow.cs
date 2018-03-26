@@ -1,72 +1,70 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace TankGame
 {
-    public class CameraFollow : MonoBehaviour, ICameraFollow
-    {
+	public class CameraFollow : MonoBehaviour
+	{
+		[SerializeField]
+		private float _distance;
 
-        [SerializeField,]
-        private float _distance;
+		[SerializeField]
+		private float _angle;
 
-        [SerializeField, Tooltip("Angle for the camera ")]
-        private float _angle;
+		[SerializeField]
+		private Transform _target;
 
-        [SerializeField, Tooltip("Which gameobject to follow:")]
-        private Transform _target;
+		private float _angleRad;
 
-        //Cameras CurrentPosition
-        private Vector3 _cameraPosition;
+		private void Awake()
+		{
+			SetAngle( _angle );
+		}
 
+		private void Update()
+		{
+			if ( _target == null )
+			{
+				return;
+			}
 
-        #region Interfaces
-        public void SetAngle(float angle)
-        {
-            _angle = angle;
-        }
+			transform.position = CalculatePosition();
+			transform.eulerAngles = CalculateDirection();
+		}
 
-        public void SetDistance(float distance)
-        {
-            _distance = distance;
-        }
+		public void SetAngle( float angle )
+		{
+			// The angle in radians can be calculated by multiplying the angle in degrees by
+			// Mathf.Deg2Rad.
+			_angle = angle;
+			_angleRad = _angle * Mathf.Deg2Rad;
+		}
 
-        public void SetTarget(Transform targetTransform)
-        {
-            _target = targetTransform;
-        }
-        #endregion
+		public void SetDistance( float distance )
+		{
+			_distance = distance;
+		}
 
-        private void LateUpdate()
-        {
+		public void SetTarget( Transform target )
+		{
+			_target = target;
+		}
 
-            Vector3 _tmpPosition = _target.position;
-            Vector3 _frwdDirection = _target.forward;
-            //Trigonometry:
-            //Distance is longest side of the triangle.
-            //HorizontalDistance is Sin from conrner and hypotenuse
-            //Height is sqrt from (hypotenusa^2 - a^2)
-            float angle = Mathf.Deg2Rad * (_angle);
-            float horizontalDistance = Mathf.Sin(angle) * _distance;
-            float height = Mathf.Sqrt((_distance * _distance) - (horizontalDistance * horizontalDistance));
+		private Vector3 CalculatePosition()
+		{
+			float x = _distance * Mathf.Sin( _angleRad );
+			float y = _distance * Mathf.Cos( _angleRad );
 
-            
+			return _target.position + _target.forward * -1 * x + _target.up * y;
+		}
 
-            _cameraPosition = _tmpPosition;
-
-            Vector3 direction = _frwdDirection;
-            direction.y = 0;
-            direction.Normalize();
-            direction = -direction * horizontalDistance;
-
-            _cameraPosition.x += direction.x;
-            _cameraPosition.y += height;
-            _cameraPosition.z += direction.z;
-
-
-            gameObject.transform.position = _cameraPosition;
-            gameObject.transform.LookAt(_target);
-        }
-
-    }
+		private Vector3 CalculateDirection()
+		{
+			Vector3 rotation = transform.eulerAngles;
+			rotation.y = _target.eulerAngles.y;
+			rotation.x = 90 - _angle;
+			return rotation;
+		}
+	}
 }

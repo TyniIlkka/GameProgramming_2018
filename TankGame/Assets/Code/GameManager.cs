@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using TankGame.Persistence;
 using UnityEngine;
+using TankGame.Messaging;
 
 namespace TankGame
 {
@@ -16,7 +17,7 @@ namespace TankGame
 		{
 			get
 			{
-				if ( _instance == null )
+				if ( _instance == null && !IsClosing )
 				{
 					GameObject gameManagerObject = new GameObject( typeof( GameManager ).Name );
 					_instance = gameManagerObject.AddComponent< GameManager >();
@@ -24,6 +25,8 @@ namespace TankGame
 				return _instance;
 			}
 		}
+
+		public static bool IsClosing { get; private set; }
 
 		#endregion
 
@@ -35,6 +38,8 @@ namespace TankGame
 		{
 			get { return Path.Combine( Application.persistentDataPath, "save" ); }
 		}
+
+		public MessageBus MessageBus { get; private set; }
 
 		protected void Awake()
 		{
@@ -51,8 +56,20 @@ namespace TankGame
 			Init();
 		}
 
+		private void OnApplicationQuit()
+		{
+			IsClosing = true;
+		}
+
 		private void Init()
 		{
+			IsClosing = false;
+
+			MessageBus = new MessageBus();
+
+			var UI = FindObjectOfType< UI.UI >();
+			UI.Init();
+
 			Unit[] allUnits = FindObjectsOfType< Unit >();
 			foreach ( Unit unit in allUnits )
 			{
@@ -79,6 +96,8 @@ namespace TankGame
 
 		public void AddUnit( Unit unit )
 		{
+			unit.Init();
+
 			if ( unit is EnemyUnit )
 			{
 				_enemyUnit.Add( unit );
@@ -89,6 +108,9 @@ namespace TankGame
 			{
 				_playerUnit = unit;
 			}
+
+			// Add unit's health to the UI.
+			UI.UI.Current.HealthUI.AddUnit( unit );
 		}
 
 		public void Save()

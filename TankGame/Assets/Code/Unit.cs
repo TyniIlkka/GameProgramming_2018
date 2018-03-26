@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TankGame.Persistence;
+using TankGame.Messaging;
 
 namespace TankGame
 {
@@ -57,11 +58,6 @@ namespace TankGame
 			private set { _id = value; }
 		}
 
-		protected void Awake()
-		{
-			Init();
-		}
-
 		protected void OnDestroy()
 		{
 			Health.UnitDied -= HandleUnitDied;
@@ -105,6 +101,7 @@ namespace TankGame
 
 		protected virtual void HandleUnitDied( Unit unit )
 		{
+			GameManager.Instance.MessageBus.Publish( new UnitDiedMessage( this ) );
 			gameObject.SetActive( false );
 		}
 

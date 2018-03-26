@@ -1,60 +1,62 @@
-﻿using UnityEngine;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace TankGame.AI
 {
-    public class ShootState : AIStateBase
-    {
-        public float SqrShootingDistance
-        {
-            get { return Owner.ShootingDistance * Owner.ShootingDistance; }
-        }
+	public class ShootState : AIStateBase
+	{
+		public ShootState( EnemyUnit owner )
+			: base( owner, AIStateType.Shoot )
+		{
+			AddTransition( AIStateType.FollowTarget );
+			AddTransition( AIStateType.Patrol );
+		}
 
-        public ShootState(EnemyUnit owner)
-            : base(owner, AIStateType.Shoot)
-        {
-            AddTransition(AIStateType.Patrol);
-            AddTransition(AIStateType.FollowTarget);
- 
-        }
+		public override void StateActivated()
+		{
+			base.StateActivated();
+			// Start listening target's UnitDied event. When target dies, go back to the
+			// patrol state.
+			Owner.Target.Health.UnitDied += OnTargetDied;
+		}
 
-        public override void Update()
-        {
-            // 1. Should we change the state?
-            //   1.1 If yes, change state and return.
-            Debug.Log("Ammutaan");
-            if (!ChangeState())
-            {
-                Owner.Weapon.Shoot();
-                Owner.Mover.Move(Owner.transform.forward);
-                Owner.Mover.Turn(Owner.Target.transform.position);
-            }
-        }
+		private void OnTargetDied( Unit target )
+		{
+			Owner.PerformTransition( AIStateType.Patrol );
+			Owner.Target = null;
+		}
 
-        private bool ChangeState()
-        {
-            // 1. Are player at detection range/dead?
-            //if yes go Patrol
 
-            if (Owner.Target.Health.CurrentHealth <= 0)
-            {
-                Owner.Target = null;
-                return Owner.PerformTransition(AIStateType.Patrol);
-            }
-               
+		public override void StateDeactivating()
+		{
+			base.StateDeactivating();
+			Owner.Target.Health.UnitDied -= OnTargetDied;
+		}
 
-            //2. Is player on shooting range and alive?
-            //if not on range and alive go followstate.
+		public override void Update()
+		{
+			if ( !ChangeState() )
+			{
+				Owner.Mover.Turn( Owner.Target.transform.position );
+				Owner.Weapon.Shoot();
+			}
+		}
 
-            Vector3 toPlayerVector =
-                Owner.transform.position - Owner.Target.transform.position;
-            float sqrDistanceToPlayer = toPlayerVector.sqrMagnitude;
+		private bool ChangeState()
+		{
+			bool result = false;
 
-            if (sqrDistanceToPlayer > SqrShootingDistance)
-            {
-                return Owner.PerformTransition(AIStateType.FollowTarget);
-            }
-            //return false if no Changing State
-            return false;
-        }
-    }
+			float distanceToTarget = Vector3.Distance( Owner.Target.transform.position,
+				Owner.transform.position );
+			if ( distanceToTarget > Owner.ShootingDistance )
+			{
+				Owner.PerformTransition( AIStateType.FollowTarget );
+				result = true;
+			}
+
+			return result;
+		}
+	}
 }
