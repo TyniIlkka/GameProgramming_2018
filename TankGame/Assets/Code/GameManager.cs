@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TankGame.Localization;
+using TankGame.Messaging;
 using TankGame.Persistence;
 using UnityEngine;
-using TankGame.Messaging;
+using L10n = TankGame.Localization.Localization;
 
 namespace TankGame
 {
@@ -61,8 +63,15 @@ namespace TankGame
 			IsClosing = true;
 		}
 
+		private void OnDestroy()
+		{
+			L10n.LanguageLoaded -= OnLanguageLoaded;
+		}
+
 		private void Init()
 		{
+			InitLocalization();
+
 			IsClosing = false;
 
 			MessageBus = new MessageBus();
@@ -77,6 +86,22 @@ namespace TankGame
 			}
 
 			_saveSystem = new SaveSystem( new BinaryPersitence( SavePath ) );
+		}
+
+		private const string LanguageKey = "Language";
+
+		private void InitLocalization()
+		{
+			LangCode currentLang =
+				(LangCode) PlayerPrefs.GetInt( LanguageKey, (int) LangCode.EN );
+			L10n.LoadLanguage( currentLang );
+			L10n.LanguageLoaded += OnLanguageLoaded;
+		}
+
+		private void OnLanguageLoaded( LangCode currentLanguage )
+		{
+			PlayerPrefs.SetInt( LanguageKey,
+				(int) currentLanguage );
 		}
 
 		protected void Update()
