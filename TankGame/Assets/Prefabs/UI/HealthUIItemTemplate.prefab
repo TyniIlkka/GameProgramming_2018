@@ -20,8 +20,8 @@ GameObject:
   m_Component:
   - component: {fileID: 224173876190240320}
   - component: {fileID: 222073231614055390}
+  - component: {fileID: 114670904167458608}
   - component: {fileID: 114862182547943004}
-  - component: {fileID: 114766890108347888}
   m_Layer: 5
   m_Name: HealthUIItemTemplate
   m_TagString: Untagged
@@ -29,7 +29,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &114766890108347888
+--- !u!114 &114670904167458608
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -37,7 +37,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1998842467598996}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6dbd6afac834d2b8f3cb0ff066d2607, type: 3}
+  m_Script: {fileID: 11500000, guid: 2630111fbe196cb4597f9537b8732c0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114862182547943004
@@ -72,7 +72,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: Score
 --- !u!222 &222073231614055390
 CanvasRenderer:
   m_ObjectHideFlags: 1

@@ -9,9 +9,11 @@ namespace TankGame
 	public class Health : INotifyPropertyChanged
 	{
 		private int _currentHealth;
+        private int _currentLives;
 
 		public event Action< Unit > UnitDied;
 		public event Action< Unit, int > HealthChanged;
+        public event Action<int> LivesChanged;
 
 		public int CurrentHealth
 		{
@@ -27,6 +29,20 @@ namespace TankGame
 				OnPropertyChanged( () => CurrentHealth );
 			}
 		}
+
+        public int CurrentLives
+        {
+            get { return _currentLives; }
+            protected set
+            {
+                _currentLives = value;
+                if (LivesChanged != null)
+                {
+                    LivesChanged(_currentLives);
+                }
+            }
+        }
+
 		public Unit Owner { get; private set; }
 
 		public Health( Unit owner, int startingHealth )
@@ -35,17 +51,33 @@ namespace TankGame
 			CurrentHealth = startingHealth;
 		}
 
-		/// <summary>
-		/// Applies damage to the Unit.
-		/// </summary>
-		/// <param name="damage">Amount of damage</param>
-		/// <returns>True, if the unit dies. False otherwise</returns>
-		public virtual bool TakeDamage( int damage )
+        public Health(Unit owner, int startingHealth, int lives)
+        {
+            Owner = owner;
+            CurrentHealth = startingHealth;
+            CurrentLives = lives;
+        }
+
+        /// <summary>
+        /// Applies damage to the Unit.
+        /// </summary>
+        /// <param name="damage">Amount of damage</param>
+        /// <returns>True, if the unit dies. False otherwise</returns>
+        public virtual bool TakeDamage( int damage )
 		{
 			CurrentHealth = Mathf.Clamp( CurrentHealth - damage, 0, CurrentHealth );
 			bool didDie = CurrentHealth == 0;
 			if ( didDie )
 			{
+                if (Owner.GetComponent<PlayerUnit>() != null)
+                {
+                    if (CurrentLives > 0)
+                    {
+                        CurrentLives--;
+                        Owner.transform.position = new Vector3(0, 0, 0);
+                        CurrentHealth = Owner.StartingHealth;   
+                    }
+                }
 				RaiseUnitDiedEvent();
 			}
 			return didDie;

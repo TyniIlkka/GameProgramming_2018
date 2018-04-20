@@ -8,9 +8,6 @@ namespace TankGame.UI
 {
 	public class HealthUIItem : MonoBehaviour
 	{
-		// A reference to the unit which health this component draws to the UI.
-		private Unit _unit;
-
 		// The component which draws the text to the UI.
 		private Text _text;
 
@@ -88,5 +85,8 @@ namespace TankGame.UI
 
 			_text.text = string.Format( translation, unitTranslation, health );
 		}
+		// A reference to the unit which health this component draws to the UI.
+		private Unit _unit;
+
 	}
 }

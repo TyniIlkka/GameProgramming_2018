@@ -52,6 +52,8 @@ namespace TankGame
 
 		public Health Health { get; protected set; }
 
+        public int StartingHealth { get { return _startingHealth; } }
+
 		public int Id
 		{
 			get { return _id; }

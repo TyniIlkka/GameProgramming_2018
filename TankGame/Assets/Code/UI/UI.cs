@@ -10,11 +10,21 @@ namespace TankGame.UI
 
 		public HealthUI HealthUI { get; private set; }
 
+        public ScoreUI ScoreUI { get; private set; }
+
+        public LivesUI LivesUI { get; private set; }
+
 		public void Init()
 		{
 			Current = this;
 			HealthUI = GetComponentInChildren< HealthUI >();
 			HealthUI.Init();
+
+            ScoreUI = GetComponentInChildren<ScoreUI>();
+            ScoreUI.Init();
+
+            LivesUI = GetComponentInChildren<LivesUI>();
+            LivesUI.Init();
 		}
 	}
 }

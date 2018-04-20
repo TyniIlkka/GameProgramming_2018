@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System;
 using TankGame.Localization;
 using TankGame.Messaging;
 using TankGame.Persistence;
@@ -36,6 +37,21 @@ namespace TankGame
 		private Unit _playerUnit = null;
 		private SaveSystem _saveSystem;
 
+        private int score;
+        [SerializeField, Tooltip("Score to win!")]
+        private int _maxScore;
+        [SerializeField, Tooltip("Player Lives:")]
+        private int m_iPlayerLives;
+
+        public event Action<int> ScoreChanged;
+        public int MaxScore { get { return _maxScore; } }
+        public int CurrentScore { get {return score; } }
+
+        public int PlayerLives
+        {
+            get { return m_iPlayerLives; }
+            private set { m_iPlayerLives = value; }
+        }
 		public string SavePath
 		{
 			get { return Path.Combine( Application.persistentDataPath, "save" ); }
@@ -66,6 +82,7 @@ namespace TankGame
 		private void OnDestroy()
 		{
 			L10n.LanguageLoaded -= OnLanguageLoaded;
+            IsClosing = true;
 		}
 
 		private void Init()
@@ -164,5 +181,38 @@ namespace TankGame
 
 			_playerUnit.SetUnitData( data.PlayerData );
 		}
+
+        public void AddScore(int amount)
+        {
+            score += amount;
+            if (ScoreChanged != null)
+            {
+                ScoreChanged(score);
+            }
+
+            if (score >= _maxScore)
+            {
+                EndGame(true);
+            }
+        }
+
+        public void PlayerDied()
+        {
+            PlayerLives--;
+            Debug.Log("Lives left: " + PlayerLives);
+
+            if (PlayerLives <= 0)
+            {
+                EndGame(false);
+            }
+        }
+
+        private void EndGame(bool status)
+        {
+            MessageBus.Publish(new GameEndMessage(isWin: status));
+            Time.timeScale = 0;
+        }
+
+        
 	}
 }
