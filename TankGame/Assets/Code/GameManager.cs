@@ -37,7 +37,7 @@ namespace TankGame
 		private Unit _playerUnit = null;
 		private SaveSystem _saveSystem;
 
-        private int score;
+        public int score;
         [SerializeField, Tooltip("Score to win!")]
         private int _maxScore;
         [SerializeField, Tooltip("Player Lives:")]
@@ -47,6 +47,7 @@ namespace TankGame
         public int MaxScore { get { return _maxScore; } }
         public int CurrentScore { get {return score; } }
 
+        public int StartingLives { get; private set; }
         public int PlayerLives
         {
             get { return m_iPlayerLives; }
@@ -95,13 +96,13 @@ namespace TankGame
 
 			var UI = FindObjectOfType< UI.UI >();
 			UI.Init();
-
+            
 			Unit[] allUnits = FindObjectsOfType< Unit >();
 			foreach ( Unit unit in allUnits )
 			{
 				AddUnit( unit );
 			}
-
+            UI.ScoreUI.AddScoreUI();
 			_saveSystem = new SaveSystem( new BinaryPersitence( SavePath ) );
 		}
 
@@ -149,10 +150,13 @@ namespace TankGame
 			else if ( unit is PlayerUnit )
 			{
 				_playerUnit = unit;
+                
+                UI.UI.Current.LivesUI.SetLivesItem(_playerUnit, PlayerLives);
 			}
 
 			// Add unit's health to the UI.
 			UI.UI.Current.HealthUI.AddUnit( unit );
+            
 		}
 
 		public void Save()

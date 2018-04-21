@@ -15,10 +15,14 @@ namespace TankGame.UI
             Debug.Log("Lives UI initialized");
         }
 
-        public void SetLivesItem(Unit unit)
+        public void SetLivesItem(Unit unit, int lives)
         {
-            _livesUIItem.Init(unit);
-            _livesUIItem.gameObject.SetActive(true);
+            if (_livesUIItem != null)
+            {
+                var LivesItem = Instantiate(_livesUIItem ,transform);
+                LivesItem.Init(unit, lives);
+                LivesItem.gameObject.SetActive(true);
+            }
         }
     }
 }

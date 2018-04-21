@@ -7,18 +7,18 @@ namespace TankGame.UI
     public class ScoreUI : MonoBehaviour
     {
         [SerializeField]
-        private ScoreUIItem _scoreUIItemPrefab;
+        private ScoreUIItem _scoreItem;
 
         public void Init()
         {
             Debug.Log("Score UI initialized");
         }
 
-        public void AddUnit(Unit unit)
+        public void AddScoreUI()
         {
-            var scoreItem = Instantiate(_scoreUIItemPrefab, transform);
-            scoreItem.Init(unit);
-            scoreItem.gameObject.SetActive(true);
+            _scoreItem.Init();
+            _scoreItem.gameObject.SetActive(true);
+            Debug.Log("Activate ScoreUI");
         }
 
     }

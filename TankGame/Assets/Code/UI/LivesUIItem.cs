@@ -19,15 +19,15 @@ namespace TankGame.UI
         /// Initialization of lives ui item.
         /// </summary>
         /// <param name="unit">Unit which lives are displayed</param>
-        public void Init(Unit unit)
+        public void Init(Unit unit, int lives)
         {
             l10n.LanguageLoaded += OnLanguageChange;
             _unit = unit;
             _text = GetComponentInChildren<Text>();
-            _maxLives = _unit.Health.CurrentLives;
+            _maxLives = lives;
 
             _unit.Health.LivesChanged += OnLivesChange;
-            SetText(_unit.Health.CurrentLives);
+            SetText(lives);
         }
 
         /// <summary>

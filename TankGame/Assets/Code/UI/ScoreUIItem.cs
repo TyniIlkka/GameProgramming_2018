@@ -11,47 +11,45 @@ namespace TankGame.UI
 
         // The component which draws the text to the UI.
         private Text _text;
-
+        private int _score;
         private const string ScoreKey = "score";
-
-        private ISubscription<ScoreChangedMessage> _scoreChangedSubscription;
 
         protected void OnDestroy()
         {
             UnregisterEventListeners();
         }
 
-        public void Init(Unit unit)
+        public void Init()
         {
-            l10n.LanguageLoaded += OnLanguageLoaded;
+            l10n.LanguageLoaded += OnLanguageChange;
             _text = GetComponentInChildren<Text>();
+            _score = GameManager.Instance.CurrentScore;
+            GameManager.Instance.ScoreChanged += SetText;
 
+            SetText(_score);
+        }
 
+        private void OnScoreChange(int score)
+        {
+            SetText(score);
+        }
+
+        private void OnLanguageChange(LangCode currentLang)
+        {
             SetText(GameManager.Instance.CurrentScore);
-        }
-
-        private void OnLanguageLoaded(LangCode currentLang)
-        {
-            SetText(_unit.Health.CurrentHealth);
-        }
-
-        private void OnScoreChange(int amount)
-        {
-            SetText(amount);
-        }
-
-        private void UnregisterEventListeners()
-        {
-            l10n.LanguageLoaded -= OnLanguageLoaded;
         }
 
         private void SetText(int currentScore)
         {
             string translation = l10n.CurrentLanguage.GetTranslation(ScoreKey);
-            int maxScore = GameManager.Instance.MaxScore;
-            _text.text = string.Format(translation, currentScore, maxScore);
+            
+            _text.text = string.Format(translation, GameManager.Instance.CurrentScore.ToString());
         }
-        // A reference to the unit which health this component draws to the UI.
-        private Unit _unit;
+
+        private void UnregisterEventListeners()
+        {
+            GameManager.Instance.ScoreChanged -= OnScoreChange;
+            l10n.LanguageLoaded -= OnLanguageChange;
+        }
     }
 }
