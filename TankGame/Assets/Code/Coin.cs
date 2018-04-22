@@ -10,7 +10,7 @@ namespace TankGame
         [SerializeField, Tooltip("Points to give amount.")]
         private int _point = 50;
         [SerializeField, Tooltip("Rotate Speed")]
-        private float rotateSpeed;
+        private float rotateSpeed = 200f;
         private System.Action<Coin> _collissionCallback;
 
         public void Init(System.Action<Coin> collissionCallback)
@@ -18,6 +18,10 @@ namespace TankGame
             _collissionCallback = collissionCallback;
         }
 
+        /// <summary>
+        /// When collided with anything add more score.
+        /// </summary>
+        /// <param name="coll"></param>
         private void OnTriggerEnter(Collider coll)
         {
             Debug.Log("Coins collected for: " + _point);
@@ -25,6 +29,10 @@ namespace TankGame
             _collissionCallback(this);
         }
 
+
+        /// <summary>
+        /// Rotates coin prefab to add illusion.
+        /// </summary>
         private void Update()
         {
             transform.Rotate(Vector3.forward * Time.deltaTime * rotateSpeed);

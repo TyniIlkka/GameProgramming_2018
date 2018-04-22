@@ -75,7 +75,12 @@ namespace TankGame
                     {
                         CurrentLives--;
                         Owner.transform.position = new Vector3(0, 0, 0);
-                        CurrentHealth = Owner.StartingHealth;   
+                        CurrentHealth = Owner.StartingHealth;
+                    }
+                    else
+                    {
+                        GameManager.Instance.WinOrLose = false;
+                        GameManager.Instance.EndGame(false);
                     }
                 }
 				RaiseUnitDiedEvent();
@@ -96,6 +101,15 @@ namespace TankGame
 			// TODO: What if the unit is dead
 			CurrentHealth = health;
 		}
+
+        /// <summary>
+        /// Sets Lives.
+        /// </summary>
+        /// <param name="lives"></param>
+        public void SetLives( int lives)
+        {
+            CurrentLives = lives;
+        }
 
 		public event PropertyChangedEventHandler PropertyChanged;
 

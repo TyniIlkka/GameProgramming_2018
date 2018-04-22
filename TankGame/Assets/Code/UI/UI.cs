@@ -14,6 +14,11 @@ namespace TankGame.UI
 
         public LivesUI LivesUI { get; private set; }
 
+        public EndUI EndUI { get; private set; }
+
+        /// <summary>
+        /// Init UI.
+        /// </summary>
 		public void Init()
 		{
 			Current = this;
@@ -25,6 +30,9 @@ namespace TankGame.UI
 
             LivesUI = GetComponentInChildren<LivesUI>();
             LivesUI.Init();
+
+            EndUI = GetComponentInChildren<EndUI>();
+            EndUI.Init();
 		}
 	}
 }

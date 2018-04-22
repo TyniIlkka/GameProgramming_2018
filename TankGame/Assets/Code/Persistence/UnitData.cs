@@ -8,6 +8,7 @@ namespace TankGame.Persistence
 	{
 		public int Id;
 		public int Health;
+        public int Lives;
 		public Vector3 Position;
 		public float YRotation;
 	}

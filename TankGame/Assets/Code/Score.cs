@@ -25,6 +25,6 @@ namespace TankGame
             }
         }
 
-        public int TargetScore { get { return m_iTargetScore;} }
+        public int WinScore { get { return m_iTargetScore;} }
     }
 }

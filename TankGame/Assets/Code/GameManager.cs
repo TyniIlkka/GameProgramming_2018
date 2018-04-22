@@ -7,45 +7,50 @@ using TankGame.Messaging;
 using TankGame.Persistence;
 using UnityEngine;
 using L10n = TankGame.Localization.Localization;
+using UnityEngine.SceneManagement;
 
 namespace TankGame
 {
-	public class GameManager : MonoBehaviour
-	{
-		#region Statics
+    public class GameManager : MonoBehaviour
+    {
+        #region Statics
 
-		private static GameManager _instance;
+        private static GameManager _instance;
 
-		public static GameManager Instance
-		{
-			get
-			{
-				if ( _instance == null && !IsClosing )
-				{
-					GameObject gameManagerObject = new GameObject( typeof( GameManager ).Name );
-					_instance = gameManagerObject.AddComponent< GameManager >();
-				}
-				return _instance;
-			}
-		}
+        public static GameManager Instance
+        {
+            get
+            {
+                if (_instance == null && !IsClosing)
+                {
+                    GameObject gameManagerObject = new GameObject(typeof(GameManager).Name);
+                    _instance = gameManagerObject.AddComponent<GameManager>();
+                }
+                return _instance;
+            }
+        }
 
-		public static bool IsClosing { get; private set; }
+        public static bool IsClosing { get; private set; }
 
-		#endregion
+        #endregion
 
-		private List< Unit > _enemyUnit = new List< Unit >();
-		private Unit _playerUnit = null;
-		private SaveSystem _saveSystem;
+        private List<Unit> _enemyUnit = new List<Unit>();
+        private Unit _playerUnit = null;
+        private SaveSystem _saveSystem;
 
-        public int score;
-        [SerializeField, Tooltip("Score to win!")]
-        private int _maxScore;
+        public Score score;
+        //[SerializeField, Tooltip("Score to win!")]            //Unused Max Score limit.
+        //private int _maxScore;
         [SerializeField, Tooltip("Player Lives:")]
         private int m_iPlayerLives;
 
+
         public event Action<int> ScoreChanged;
-        public int MaxScore { get { return _maxScore; } }
-        public int CurrentScore { get {return score; } }
+        //public int MaxScore { get { return _maxScore; } }
+        public Score Score { get { return score; } private set { score = value; } }
+
+        public bool WinOrLose{ get; set;}
+
 
         public int StartingLives { get; private set; }
         public int PlayerLives
@@ -96,15 +101,17 @@ namespace TankGame
 
 			var UI = FindObjectOfType< UI.UI >();
 			UI.Init();
+            UI.ScoreUI.AddScoreUI();
             
 			Unit[] allUnits = FindObjectsOfType< Unit >();
 			foreach ( Unit unit in allUnits )
 			{
 				AddUnit( unit );
 			}
-            UI.ScoreUI.AddScoreUI();
 			_saveSystem = new SaveSystem( new BinaryPersitence( SavePath ) );
-		}
+
+            
+        }
 
 		private const string LanguageKey = "Language";
 
@@ -150,14 +157,24 @@ namespace TankGame
 			else if ( unit is PlayerUnit )
 			{
 				_playerUnit = unit;
-                
+                _playerUnit.Health.SetLives(PlayerLives);
                 UI.UI.Current.LivesUI.SetLivesItem(_playerUnit, PlayerLives);
+                
 			}
 
 			// Add unit's health to the UI.
 			UI.UI.Current.HealthUI.AddUnit( unit );
             
 		}
+
+        /// <summary>
+        /// Sends new Health UI for respawned unit.
+        /// </summary>
+        /// <param name="unit"></param>
+        public void RespawnUnit(Unit unit)
+        {
+            UI.UI.Current.HealthUI.AddUnit(unit);
+        }
 
 		public void Save()
 		{
@@ -186,20 +203,27 @@ namespace TankGame
 			_playerUnit.SetUnitData( data.PlayerData );
 		}
 
+        /// <summary>
+        /// Add more score and send scorechange.
+        /// </summary>
+        /// <param name="amount">Add amount of score to currentscore</param>
         public void AddScore(int amount)
         {
-            score += amount;
+            Score.CurrentScore += amount;
             if (ScoreChanged != null)
             {
-                ScoreChanged(score);
+                ScoreChanged(Score.CurrentScore);
             }
 
-            if (score >= _maxScore)
+            if (Score.CurrentScore >= Score.WinScore)
             {
+                WinOrLose = true;
                 EndGame(true);
             }
         }
-
+        /// <summary>
+        /// Player died.
+        /// </summary>
         public void PlayerDied()
         {
             PlayerLives--;
@@ -207,16 +231,32 @@ namespace TankGame
 
             if (PlayerLives <= 0)
             {
+                WinOrLose = false;
                 EndGame(false);
             }
         }
 
-        private void EndGame(bool status)
+        /// <summary>
+        /// Sends EndGame UI init and publish message
+        /// </summary>
+        /// <param name="status">true = victory, false = lost.</param>
+        public void EndGame(bool status)
         {
-            MessageBus.Publish(new GameEndMessage(isWin: status));
+            UI.UI.Current.EndUI.EndGame(WinOrLose);
+            MessageBus.Publish(new GameEndMessage(isWin: WinOrLose));
             Time.timeScale = 0;
         }
 
+        /// <summary>
+        /// Reset the game.
+        /// </summary>
+        public void ResetGame()
+        {
+            _playerUnit.Health.SetHealth(_playerUnit.StartingHealth);
+            IsClosing = true;
+            Debug.LogError("Reset new game currently not working");
+            SceneManager.LoadScene("level1");
+        }
         
 	}
 }

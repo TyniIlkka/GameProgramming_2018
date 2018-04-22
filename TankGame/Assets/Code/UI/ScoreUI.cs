@@ -16,6 +16,8 @@ namespace TankGame.UI
 
         public void AddScoreUI()
         {
+            //_scoreItem.GetComponentInChildren<ScoreUIItem>();
+            //var LivesItem = Instantiate(_scoreItem, transform);
             _scoreItem.Init();
             _scoreItem.gameObject.SetActive(true);
             Debug.Log("Activate ScoreUI");

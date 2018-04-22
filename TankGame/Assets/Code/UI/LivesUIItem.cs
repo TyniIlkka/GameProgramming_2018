@@ -40,7 +40,7 @@ namespace TankGame.UI
         }
 
         /// <summary>
-        /// Updates lives text when language is changed.
+        /// Updates lives text when language is changed.    
         /// </summary>
         /// <param name="currentLang">Current language code</param>
         private void OnLanguageChange(LangCode currentLang)
@@ -55,7 +55,7 @@ namespace TankGame.UI
         private void SetText(int lives)
         {
             string translation = l10n.CurrentLanguage.GetTranslation(LivesKey);
-            _text.text = string.Format(translation, lives, _maxLives);
+            _text.text = string.Format(translation, _unit.Health.CurrentLives, _maxLives);
         }
 
         private void OnDestroy()

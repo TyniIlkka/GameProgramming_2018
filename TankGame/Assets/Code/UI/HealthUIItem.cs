@@ -14,6 +14,7 @@ namespace TankGame.UI
 		private const string HealthKey = "health";
 
 		private ISubscription< UnitDiedMessage > _unitDiedSubscription;
+        private ISubscription<RespawnedTank> _tankRespawned;
 
 		public bool IsEnemy
 		{
@@ -22,6 +23,7 @@ namespace TankGame.UI
 
 		protected void OnDestroy()
 		{
+            GameManager.Instance.MessageBus.Unsubscribe(_tankRespawned);
 			UnregisterEventListeners();
 		}
 
@@ -37,6 +39,8 @@ namespace TankGame.UI
 			//_unit.Health.UnitDied += OnUnitDied;
 			_unitDiedSubscription =
 				GameManager.Instance.MessageBus.Subscribe< UnitDiedMessage >( OnUnitDied );
+            _tankRespawned = GameManager.Instance.MessageBus.Subscribe<RespawnedTank>(OnUnitRespawned);
+
 			SetText( _unit.Health.CurrentHealth );
 		}
 
@@ -45,6 +49,10 @@ namespace TankGame.UI
 			SetText( _unit.Health.CurrentHealth );
 		}
 
+        /// <summary>
+        /// Waits dying units.
+        /// </summary>
+        /// <param name="msg">Dead Unit</param>
 		private void OnUnitDied( UnitDiedMessage msg )
 		{
 			if ( msg.DeadUnit == _unit )
@@ -54,18 +62,26 @@ namespace TankGame.UI
 			}
 		}
 
-		//private void OnUnitDied(Unit obj)
-		//{
-		//	UnregisterEventListeners();
-		//}
-
-		private void UnregisterEventListeners()
+        /// <summary>
+        /// Waits UnitRespawn message.
+        /// </summary>
+        /// <param name="msg"></param>
+        private void OnUnitRespawned(RespawnedTank msg)
+        {
+            if (msg.DeadUnit == _unit)
+            {
+                _unit.Health.HealthChanged += OnUnitHealthChanged;
+                _unitDiedSubscription = GameManager.Instance.MessageBus.Subscribe<UnitDiedMessage>(OnUnitDied);
+                SetText(_unit.Health.CurrentHealth);
+            }   
+        }
+        
+        private void UnregisterEventListeners()
 		{
 			l10n.LanguageLoaded -= OnLanguageLoaded;
 			_unit.Health.HealthChanged -= OnUnitHealthChanged;
 			if ( !GameManager.IsClosing )
 				GameManager.Instance.MessageBus.Unsubscribe( _unitDiedSubscription );
-			//_unit.Health.UnitDied -= OnUnitDied;
 		}
 
 		private void OnUnitHealthChanged( Unit unit, int health )

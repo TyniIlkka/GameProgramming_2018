@@ -11,7 +11,7 @@ namespace TankGame.UI
 
         // The component which draws the text to the UI.
         private Text _text;
-        private int _score;
+        private Score _score;
         private const string ScoreKey = "score";
 
         protected void OnDestroy()
@@ -23,10 +23,10 @@ namespace TankGame.UI
         {
             l10n.LanguageLoaded += OnLanguageChange;
             _text = GetComponentInChildren<Text>();
-            _score = GameManager.Instance.CurrentScore;
-            GameManager.Instance.ScoreChanged += SetText;
+            _score = GameManager.Instance.score;
+            _score.ScoreChanged += OnScoreChange;
 
-            SetText(_score);
+            SetText(_score.CurrentScore);
         }
 
         private void OnScoreChange(int score)
@@ -36,14 +36,13 @@ namespace TankGame.UI
 
         private void OnLanguageChange(LangCode currentLang)
         {
-            SetText(GameManager.Instance.CurrentScore);
+            SetText(_score.CurrentScore);
         }
 
         private void SetText(int currentScore)
         {
             string translation = l10n.CurrentLanguage.GetTranslation(ScoreKey);
-            
-            _text.text = string.Format(translation, GameManager.Instance.CurrentScore.ToString());
+            _text.text = string.Format(translation, currentScore);
         }
 
         private void UnregisterEventListeners()

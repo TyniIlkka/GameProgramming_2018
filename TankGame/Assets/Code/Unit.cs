@@ -126,5 +126,14 @@ namespace TankGame
 
 			// TODO: Set gameobject active?
 		}
+
+        /// <summary>
+        /// Sets unit healt to starting healt and position to zero. Or if commented keeps the current position.
+        /// </summary>
+        public void Respawn()
+        {
+            Health.SetHealth(_startingHealth);
+            transform.position = new Vector3(0, 0, 0);
+        }
 	}
 }

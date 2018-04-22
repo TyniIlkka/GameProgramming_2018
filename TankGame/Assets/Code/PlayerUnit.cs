@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TankGame.Persistence;
 using UnityEngine;
 
 namespace TankGame
@@ -32,5 +33,17 @@ namespace TankGame
 			float turn = Input.GetAxis( _horizontalAxis );
 			return new Vector3(turn, 0, movement);
 		}
-	}
+
+        public override UnitData GetUnitData()
+        {
+            return new UnitData
+            {
+                Health = Health.CurrentHealth,
+                Lives = Health.CurrentLives,
+                Position = transform.position,
+                YRotation = transform.eulerAngles.y,
+                Id = Id
+            };
+        }
+    }
 }
